@@ -75,8 +75,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Vector;
 
-import org.jfedor.frozenbubble.R;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;

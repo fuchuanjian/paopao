@@ -51,8 +51,6 @@
 
 package com.chuanonly.bubble;
 
-import org.jfedor.frozenbubble.R;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
