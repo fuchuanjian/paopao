@@ -86,8 +86,6 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.chuanonly.bubble.GameView.GameThread;
-import com.chuanonly.bubble.core.MODResourcePlayer;
-import com.chuanonly.bubble.core.PlayerThread;
 
 public class FrozenBubble extends Activity implements GameView.GameListener
 {
@@ -123,7 +121,7 @@ public class FrozenBubble extends Activity implements GameView.GameListener
   private static int     gameMode     = GAME_NORMAL;
   private static boolean musicOn      = true;
   private static boolean soundOn      = true;
-  private static boolean dontRushMe   = false;
+  private static boolean dontRushMe   = true;
   private static boolean aimThenShoot = false;
 
   private boolean fullscreen = true;
@@ -150,33 +148,8 @@ public class FrozenBubble extends Activity implements GameView.GameListener
 
   private SharedPreferences mConfig;
   public static final int   DEFAULT_SONG = 0;
-  private MODResourcePlayer resplayer    = null;
   private int               mod_now;
   private int               mod_was;
-
-  private final int[] MODlist = {
-     R.raw.aftertherain,
-     R.raw.ambientlight,
-     R.raw.ambientpower,
-     R.raw.androidrupture,
-     R.raw.artificial,
-     R.raw.bluestars,
-     R.raw.chungababe,
-     R.raw.crystalhammer,
-     R.raw.dreamscope,
-     R.raw.fountainofsighs,
-     R.raw.freefall,
-     R.raw.gaeasawakening,
-     R.raw.guitarous,
-     R.raw.homesick,
-     R.raw.ifcrystals,
-     R.raw.nimbus,
-     R.raw.popcorn,
-     R.raw.stardustmemories,
-     R.raw.sunshineofthemorningsun,
-     R.raw.technostyleiii,
-     R.raw.worldofpeace
-  };
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu)
@@ -235,7 +208,6 @@ public class FrozenBubble extends Activity implements GameView.GameListener
      switch (item.getItemId()) {
      case MENU_NEW_GAME:
         mGameThread.newGame();
-        newPlayer( true );
         return true;
      case MENU_COLORBLIND_MODE_ON:
         setMode(GAME_COLORBLIND);
@@ -280,17 +252,17 @@ public class FrozenBubble extends Activity implements GameView.GameListener
                    @Override
                    public void onClick(DialogInterface dialog, int id) {
                       // User clicked OK.
-                      if ( resplayer != null )
-                      {
-                         if ( getMusicOn() == true )
-                         {
-                            resplayer.setVolume( 255 );
-                         }
-                         else
-                         {
-                            resplayer.setVolume( 0 );
-                         }
-                      }
+//                      if ( resplayer != null )
+//                      {
+//                         if ( getMusicOn() == true )
+//                         {
+//                            resplayer.setVolume( 255 );
+//                         }
+//                         else
+//                         {
+//                            resplayer.setVolume( 0 );
+//                         }
+//                      }
                    }
                });
         builder.create();
@@ -428,7 +400,7 @@ public class FrozenBubble extends Activity implements GameView.GameListener
     }
     mGameView.requestFocus();
     setFullscreen();
-    newPlayer( true );
+//    newPlayer( true );
   }
 
   /**
@@ -459,7 +431,8 @@ public class FrozenBubble extends Activity implements GameView.GameListener
     //   Pause the MOD player and preserve song information.
     //
     //
-    resplayer.PausePlay();
+//    resplayer.PausePlay();
+    SoundPlayHelper.getInstance().stopBGMusic();
     savePlayerState( );
   }
 
@@ -488,11 +461,12 @@ public class FrozenBubble extends Activity implements GameView.GameListener
     }
     mGameView   = null;
     mGameThread = null;
-    if (resplayer != null)
-    {
-      resplayer.StopAndClose();
-      resplayer = null;
-    }
+//    if (resplayer != null)
+//    {
+//      resplayer.StopAndClose();
+//      resplayer = null;
+//    }
+    SoundPlayHelper.getInstance().release();
   }
 
   /**
@@ -536,7 +510,6 @@ public class FrozenBubble extends Activity implements GameView.GameListener
         mGameThread.newGame();
         mGameView.requestFocus();
         setFullscreen();
-        newPlayer( true );
       }
     }
   }
@@ -554,7 +527,8 @@ public class FrozenBubble extends Activity implements GameView.GameListener
         break;
 
       case GameView.EVENT_GAME_PAUSED:
-        resplayer.PausePlay();
+//        resplayer.PausePlay();
+    	    SoundPlayHelper.getInstance().stopBGMusic();
         break;
 
       case GameView.EVENT_GAME_RESUME:
@@ -563,41 +537,41 @@ public class FrozenBubble extends Activity implements GameView.GameListener
         //   the current MOD.  Otherwise, create it.
         //
         //
-        if (resplayer == null)
-        {
-          //
-          //   Get a new player thread with this mod file data.
-          //
-          //
-          resplayer = new MODResourcePlayer(this);
-          //
-          //   Restore song number and current pattern so we can resume
-          //   from there...
-          //
-          //
-          mConfig = getSharedPreferences(SHARED_PREFS_NAME, 0);
-          mod_now = mConfig.getInt(PREFS_SONGNUM, DEFAULT_SONG);
-          int pattern = mConfig.getInt(PREFS_SONGPATTERN, 0);
-          resplayer.LoadMODResource(MODlist[mod_now]);
-          resplayer.setCurrentPattern(pattern);
-          //
-          // Start up the music.
-          //
-          //
-          resplayer.start();
-          mod_was = mod_now;
-        }
-        else
-        {
-          if ( mod_now != mod_was )
-             playCurrentMOD( );
-          else
-             resplayer.UnPausePlay();
-        }
+//        if (resplayer == null)
+//        {
+//          //
+//          //   Get a new player thread with this mod file data.
+//          //
+//          //
+//          resplayer = new MODResourcePlayer(this);
+//          //
+//          //   Restore song number and current pattern so we can resume
+//          //   from there...
+//          //
+//          //
+//          mConfig = getSharedPreferences(SHARED_PREFS_NAME, 0);
+//          mod_now = mConfig.getInt(PREFS_SONGNUM, DEFAULT_SONG);
+//          int pattern = mConfig.getInt(PREFS_SONGPATTERN, 0);
+//          resplayer.LoadMODResource(MODlist[mod_now]);
+//          resplayer.setCurrentPattern(pattern);
+//          //
+//          // Start up the music.
+//          //
+//          //
+//          resplayer.start();
+//          mod_was = mod_now;
+//        }
+//        else
+//        {
+//          if ( mod_now != mod_was )
+//             playCurrentMOD( );
+//          else
+//             resplayer.UnPausePlay();
+//        }
+    	    SoundPlayHelper.getInstance().playBGMusic();
         break;
 
       case GameView.EVENT_LEVEL_START:
-        playCurrentMOD( );
         break;
 
       default:
@@ -605,77 +579,6 @@ public class FrozenBubble extends Activity implements GameView.GameListener
     }
   }
 
-  void newPlayer( boolean startPausedFlag )
-  {
-    //*****************************************
-    // Start up the MOD player
-    // *****************************************
-    //
-    //   Get the MOD playlist song index.  If the game is going to be
-    //   played starting at the first game level, set the current MOD
-    //   index to the first song in the playlist.  Otherwise, load the
-    //   song index that was last saved in the MOD player preferences.
-    //
-    //
-    if ( mGameView.getThread().getCurrentLevelIndex() == 0 )
-    {
-       mod_now = 0;
-    }
-    else
-    {
-       mConfig = getSharedPreferences(SHARED_PREFS_NAME, 0);
-       mod_now = mConfig.getInt(PREFS_SONGNUM, DEFAULT_SONG);
-    }
-    //
-    //   If the MOD player instance is not NULL, destroy it and create
-    //   a new one.
-    //
-    //
-    if (resplayer != null)
-    {
-       resplayer.StopAndClose();
-       resplayer = null;
-    }
-    // load the mod file
-    resplayer = new MODResourcePlayer(this);
-    resplayer.setLoopCount(PlayerThread.LOOP_SONG_FOREVER);
-    resplayer.LoadMODResource(MODlist[mod_now]);
-    resplayer.setLoopCount(PlayerThread.LOOP_SONG_FOREVER);
-    if ( getMusicOn() == true )
-    {
-      resplayer.setVolume( 255 );
-    }
-    else
-    {
-      resplayer.setVolume( 0 );
-    }
-    // start up the music (well, start the thread, at least...)
-    resplayer.startPaused(startPausedFlag);
-    resplayer.start();
-    mod_was = mod_now;
-  }
-
-  //
-  //   Play the current song in our playlist from the beginning of the
-  //   song.
-  //
-  //   The current MOD index may have been modified externally.
-  //
-  //
-  public void playCurrentMOD()
-  {
-     if (resplayer != null)
-     {
-        resplayer.PausePlay();
-        if (mod_now >= MODlist.length) mod_now = 0;
-        // load the current MOD into the player
-        resplayer.LoadMODResource(MODlist[mod_now]);
-        resplayer.UnPausePlay();
-        mod_was = mod_now;
-     }
-     else
-        newPlayer( false );
-  }
 
   public void savePlayerState()
   {
@@ -686,7 +589,6 @@ public class FrozenBubble extends Activity implements GameView.GameListener
     //
     SharedPreferences.Editor prefs = getSharedPreferences(SHARED_PREFS_NAME, 0).edit();
     prefs.putInt(PREFS_SONGNUM, mod_now);
-    prefs.putInt(PREFS_SONGPATTERN, resplayer.getCurrentPattern());
     prefs.commit();
   }
 
